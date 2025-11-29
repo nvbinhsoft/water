@@ -13,7 +13,7 @@ interface Props {
 
 export const MarkdownRenderer = ({ content }: Props) => {
   const [copiedBlock, setCopiedBlock] = useState<string | null>(null);
-  const rehypePlugins: PluggableList = [[rehypeHighlight as unknown as Plugin, { detect: true }]];
+  const rehypePlugins: PluggableList = [[rehypeHighlight as unknown as Plugin, { detect: true, ignoreMissing: true }]];
 
   type CodeProps = ComponentPropsWithoutRef<'code'> & { inline?: boolean; node?: unknown };
 

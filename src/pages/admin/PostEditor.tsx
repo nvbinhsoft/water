@@ -8,6 +8,7 @@ import {
   useUploadImage,
 } from '../../hooks/adminQueries';
 import { MarkdownRenderer } from '../../components/MarkdownRenderer';
+import { RichMarkdownEditor } from '../../components/RichMarkdownEditor';
 import { PostStatus } from '../../types/api';
 
 const emptyForm = {
@@ -68,15 +69,12 @@ const AdminPostEditorPage = () => {
     navigate('/admin/posts');
   };
 
-  const insertCodeBlock = () => {
-    updateField('body', `${form.body}\n\n\`\`\`ts\n// code here\n\`\`\`\n`);
-  };
-
-  const handleUpload = async (file?: File) => {
-    if (!file) return;
+  const handleEditorUpload = async (file: File) => {
     const res = await uploadImage.mutateAsync(file);
-    updateField('body', `${form.body}\n\n![image](${res.url})\n`);
-    updateField('coverImageUrl', res.url);
+    if (!form.coverImageUrl) {
+      updateField('coverImageUrl', res.url);
+    }
+    return res.url;
   };
 
   return (
@@ -86,27 +84,9 @@ const AdminPostEditorPage = () => {
           <p className="text-sm uppercase tracking-wide text-indigo-600">{postId ? 'Edit Post' : 'New Post'}</p>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Markdown Editor</h1>
         </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={insertCodeBlock}
-            className="rounded-md border border-slate-200 px-3 py-1 text-sm text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100"
-          >
-            Insert code block
-          </button>
-          <label className="cursor-pointer rounded-md border border-slate-200 px-3 py-1 text-sm text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100">
-            Upload image
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => handleUpload(e.target.files?.[0])}
-            />
-          </label>
-        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-2">
+      <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[100%_0%]">
         <div className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700 dark:text-slate-200">Title</label>
@@ -170,11 +150,10 @@ const AdminPostEditorPage = () => {
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700 dark:text-slate-200">Markdown Body</label>
-            <textarea
+            <RichMarkdownEditor
               value={form.body}
-              onChange={(e) => updateField('body', e.target.value)}
-              className="min-h-[420px] w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-mono shadow-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-              required
+              onChange={(next) => updateField('body', next)}
+              onUploadImage={handleEditorUpload}
             />
           </div>
           <button
@@ -186,7 +165,6 @@ const AdminPostEditorPage = () => {
           </button>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
-          <p className="text-sm uppercase tracking-wide text-indigo-600">Live preview</p>
           <MarkdownRenderer content={form.body} />
         </div>
       </form>
