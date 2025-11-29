@@ -35,6 +35,17 @@ A React + TypeScript frontend for a developer-focused personal blog with a Subst
    npm run preview
    ```
 
+### Running with mock data (no backend required)
+Set `VITE_USE_MOCKS=true` to serve the UI with in-memory endpoints powered by `axios-mock-adapter`:
+
+```bash
+VITE_USE_MOCKS=true npm run dev
+```
+
+Mock credentials for the admin area:
+- **Username:** `admin@example.com`
+- **Password:** `password`
+
 ## Configuration
 - API base URL is set to `http://localhost:8080/api` in `src/api/http.ts`. Update it there if your backend runs elsewhere.
 - Admin authentication stores the returned access token in `localStorage`; protected routes redirect to the login page when unauthenticated.

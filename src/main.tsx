@@ -14,14 +14,23 @@ const queryClient = new QueryClient({
   },
 });
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </QueryClientProvider>
-    </ThemeProvider>
-  </React.StrictMode>
-);
+async function bootstrap() {
+  if (import.meta.env.VITE_USE_MOCKS === 'true') {
+    const { setupMockApi } = await import('./mocks/setupMockApi');
+    setupMockApi();
+  }
+
+  ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+    <React.StrictMode>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </React.StrictMode>
+  );
+}
+
+bootstrap();
