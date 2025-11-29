@@ -1,4 +1,5 @@
 import MockAdapter from 'axios-mock-adapter';
+import { AxiosHeaders, type AxiosRequestConfig } from 'axios';
 import api from '../api/http';
 import {
   AuthResponse,
@@ -75,8 +76,27 @@ function paginate<T>(items: T[], page = 0, size = 10): PaginatedResponse<T> {
   };
 }
 
-function matchAuth(headers?: Record<string, string | undefined>): boolean {
-  const authHeader = headers?.Authorization ?? headers?.authorization;
+function extractAuthHeader(headers?: AxiosRequestConfig['headers']): string | undefined {
+  if (!headers) return undefined;
+  if (headers instanceof AxiosHeaders) {
+    const header = headers.get('Authorization') ?? headers.get('authorization');
+    if (Array.isArray(header)) return header.join(', ');
+    return header ? String(header) : undefined;
+  }
+
+  if (typeof headers === 'object') {
+    const record = headers as Record<string, unknown>;
+    const raw = record.Authorization ?? record.authorization;
+    if (Array.isArray(raw)) return raw.join(', ');
+    if (raw == null) return undefined;
+    return String(raw);
+  }
+
+  return undefined;
+}
+
+function matchAuth(headers?: AxiosRequestConfig['headers']): boolean {
+  const authHeader = extractAuthHeader(headers);
   return Boolean(authHeader?.startsWith('Bearer'));
 }
 
@@ -131,8 +151,9 @@ export function setupMockApi() {
   // Auth
   mock.onPost('/auth/login').reply((config) => {
     const credentials = config.data ? JSON.parse(config.data) : {};
-    const { username, password } = credentials;
-    if (username === 'admin@example.com' && password === 'password') {
+    const { username, email, password } = credentials;
+    const identifier = username ?? email;
+    if (identifier === 'admin@example.com' && password === 'password') {
       const response: AuthResponse = {
         accessToken: 'mock-token',
         tokenType: 'Bearer',

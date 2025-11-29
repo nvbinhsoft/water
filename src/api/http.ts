@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosRequestHeaders } from 'axios';
 import { getAuthToken, clearAuthToken } from '../utils/auth';
 
 const api = axios.create({
@@ -8,8 +8,10 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const auth = getAuthToken();
   if (auth) {
-    config.headers = config.headers ?? {};
-    config.headers.Authorization = `${auth.type} ${auth.token}`;
+    const headers: AxiosRequestHeaders =
+      (config.headers as AxiosRequestHeaders | undefined) ?? ({} as AxiosRequestHeaders);
+    headers.Authorization = `${auth.type} ${auth.token}`;
+    config.headers = headers;
   }
   return config;
 });
