@@ -79,21 +79,36 @@ const AdminPostEditorPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm uppercase tracking-wide text-indigo-600">{postId ? 'Edit Post' : 'New Post'}</p>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Markdown Editor</h1>
+      <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm backdrop-blur dark:border-slate-800/80 dark:bg-slate-900/80">
+        <div className="flex items-center gap-3">
+          <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(16,185,129,0.15)]"></span>
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-indigo-500">{postId ? 'Editing' : 'Draft'}</p>
+            <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Compose post</h1>
+          </div>
         </div>
+        <button
+          type="submit"
+          form="post-editor-form"
+          className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-indigo-700"
+          disabled={createPost.isPending || updatePost.isPending}
+        >
+          {postId ? 'Save changes' : 'Publish draft'}
+        </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[100%_0%]">
-        <div className="space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        id="post-editor-form"
+        className="grid gap-6 lg:grid-cols-[65%_35%] xl:grid-cols-[68%_32%] 2xl:grid-cols-[70%_30%]"
+      >
+        <div className="space-y-4 rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-sm backdrop-blur dark:border-slate-800/80 dark:bg-slate-900/80">
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700 dark:text-slate-200">Title</label>
             <input
               value={form.title}
               onChange={(e) => updateField('title', e.target.value)}
-              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-base shadow-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               required
             />
           </div>
@@ -103,7 +118,7 @@ const AdminPostEditorPage = () => {
               <input
                 value={form.slug}
                 onChange={(e) => updateField('slug', e.target.value)}
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 required
               />
             </div>
@@ -112,7 +127,7 @@ const AdminPostEditorPage = () => {
               <select
                 value={form.status}
                 onChange={(e) => updateField('status', e.target.value as PostStatus)}
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               >
                 <option value="DRAFT">Draft</option>
                 <option value="PUBLISHED">Published</option>
@@ -124,7 +139,7 @@ const AdminPostEditorPage = () => {
             <textarea
               value={form.excerpt}
               onChange={(e) => updateField('excerpt', e.target.value)}
-              className="min-h-[80px] w-full rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="min-h-[80px] w-full rounded-xl border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               required
             />
           </div>
@@ -133,7 +148,7 @@ const AdminPostEditorPage = () => {
             <input
               value={form.coverImageUrl}
               onChange={(e) => updateField('coverImageUrl', e.target.value)}
-              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               placeholder="https://..."
             />
           </div>
@@ -141,7 +156,10 @@ const AdminPostEditorPage = () => {
             <label className="text-sm font-medium text-slate-700 dark:text-slate-200">Tags</label>
             <div className="flex flex-wrap gap-2">
               {tags?.map((tag) => (
-                <label key={tag.id} className="flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1 text-xs dark:border-slate-700">
+                <label
+                  key={tag.id}
+                  className="flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1 text-xs shadow-sm dark:border-slate-700"
+                >
                   <input type="checkbox" checked={form.tagIds.includes(tag.id)} onChange={() => toggleTag(tag.id)} />
                   {tag.name}
                 </label>
@@ -156,15 +174,9 @@ const AdminPostEditorPage = () => {
               onUploadImage={handleEditorUpload}
             />
           </div>
-          <button
-            type="submit"
-            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700"
-            disabled={createPost.isPending || updatePost.isPending}
-          >
-            {postId ? 'Save changes' : 'Create post'}
-          </button>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
+
+        <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-sm backdrop-blur dark:border-slate-800/80 dark:bg-slate-900/80">
           <MarkdownRenderer content={form.body} />
         </div>
       </form>
